@@ -63,6 +63,8 @@ draft → needs_clarification → planned → waiting_user_approval
       → completed / failed / cancelled
 ```
 
+子 Agent 的交接必须符合 `workspace/handoff.schema.json`，至少写明完成步骤、发现、未知项和下一步，不能只返回一段自然语言。
+
 ## 证据状态
 
 `user_provided`、`database_native`、`paper_extracted`、`verified_human`、`computed`、`model_predicted`、`hypothesis`、`unverified`。
