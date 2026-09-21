@@ -47,6 +47,10 @@
 
 ## 架构
 
+下面这张图是仓库中的可复现 SVG 资产，展示了 Agent 入口、三种科研编排模式、确定性科学工具、证据工作区、外部数据源和远程计算确认闸门。需要更新架构时可以重新运行 `python3 scripts/draw_architecture.py`。
+
+![New Energy Research Agent architecture](docs/architecture.svg)
+
 ```text
 Codex / Claude Code / 其他兼容 Agent
                  │

@@ -58,3 +58,4 @@
 - [x] GitHub API 实测密钥有效、目标仓库可访问，返回 push 权限。
 - [x] 推送 main 成功（GitHub 返回 new branch）；使用 GitHub API 核对远端提交。
 - [x] 按开源科研 Agent 项目惯例重写 README：能力地图、架构、快速开始、真实演示、限制、评估和社区参考。
+- [x] 添加可复现 SVG 架构图并嵌入 README。
