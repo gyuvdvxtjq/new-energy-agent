@@ -1,0 +1,20 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.DS_Store
+
+# Generated task state and runtime artifacts
+workspace/current_task.yaml
+workspace/task_log.md
+workspace/handoffs/*
+approvals/*.json
+approvals/*.md
+logs/*
+reports/*
+datasets/raw/*
+datasets/processed/*
+calculations/*
+extracted/*
+papers/*
+structures/*
