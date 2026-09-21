@@ -1,6 +1,6 @@
 # 任务状态
 
-状态：`in_progress`
+状态：`complete_with_external_optional_sources`
 
 ## 已完成
 
@@ -10,9 +10,9 @@
 - [x] 确认远程 SSH/Slurm 需用户确认
 - [x] 建立项目规格、架构、决策和验收文档
 
-## 进行中
+## 外部可选扩展
 
-- [ ] 材料级 Figshare 数据自动下载；当前 HTTP 403，已登记来源和字段，等待浏览器/人工下载或同源镜像。
+- Figshare 材料级数据自动下载当前 HTTP 403；来源、字段和许可证已登记。它不阻塞本地 Agent、Zenodo 电池数据验证或 Materials Project 适配器。
 
 已完成本轮：
 
