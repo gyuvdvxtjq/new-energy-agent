@@ -21,6 +21,7 @@
 | 远程计算安全边界 | `compute_plan.py` | 只生成计划，不提交 SSH/Slurm |
 | MP 可选接入 | `query_materials_project.py` | 无 key 时明确提示，不保存密钥 |
 | 真实本地端到端演示 | `demo_run/` | 公开 Zenodo 电池数据完成质量检查和分组性能基线 |
+| 材料级预测演示 | `demo_run/material_workflow.md` | 168 条公开 NCM 材料记录，IC/EC 回归基线已运行 |
 
 ## 项目交付内容
 

@@ -22,5 +22,5 @@ def main() -> int:
     engineering=round(sum(x['weight'] for x in checks if x['passed'])/sum(x['weight'] for x in checks)*100,1)
     scientific=round(sum(x['weight'] for x in checks if x['passed'] and x['name'] not in {'dft_feature_join','live_remote_compute'})/sum(x['weight'] for x in checks)*100,1)
     result={'engineering_readiness':engineering,'scientific_demo_readiness':scientific,'max_score':100,'checks':checks,'interpretation':'readiness score, not a scientific validity score; missing DFT join and remote compute are explicit failures','limitations':['Does not replace expert review, a real Materials Project query, or external compute validation.']}
-    a.out.parent.mkdir(parents=True,exist_ok=True); a.out.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n'); print(json.dumps(result,ensure_ascii=False,indent=2)); return 0 if score>=80 else 1
+    a.out.parent.mkdir(parents=True,exist_ok=True); a.out.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n'); print(json.dumps(result,ensure_ascii=False,indent=2)); return 0 if engineering>=80 else 1
 if __name__=='__main__': raise SystemExit(main())
