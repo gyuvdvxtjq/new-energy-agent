@@ -1,0 +1,63 @@
+{
+  "input": "/root/new-energy-agent/datasets/raw/NMC_numerical_new.csv",
+  "rows": 168,
+  "columns": [
+    "Li",
+    "Ni",
+    "Co",
+    "Mn",
+    "M",
+    "LC_a",
+    "LC_c",
+    "CV",
+    "CD",
+    "V_min",
+    "V_max",
+    "Mr_dopant",
+    "Mr",
+    "no_electron_M",
+    "EN_M",
+    "No_iso_dopant",
+    "E_ion_dopant",
+    "EA_dopant",
+    "AR_dopant",
+    "IR_dopant",
+    "IC",
+    "EC"
+  ],
+  "target": "IC",
+  "groups": [],
+  "missing": {
+    "Li": 0,
+    "Ni": 0,
+    "Co": 0,
+    "Mn": 0,
+    "M": 0,
+    "LC_a": 0,
+    "LC_c": 0,
+    "CV": 0,
+    "CD": 0,
+    "V_min": 0,
+    "V_max": 0,
+    "Mr_dopant": 0,
+    "Mr": 0,
+    "no_electron_M": 0,
+    "EN_M": 0,
+    "No_iso_dopant": 0,
+    "E_ion_dopant": 0,
+    "EA_dopant": 0,
+    "AR_dopant": 0,
+    "IR_dopant": 0,
+    "IC": 0,
+    "EC": 0
+  },
+  "duplicate_rows": 0,
+  "warnings": [
+    "no grouping rule supplied; random splitting may leak material, source, batch, or protocol information"
+  ],
+  "identifier_like_columns": [],
+  "target_summary": {
+    "non_null": 168,
+    "unique": 165
+  }
+}

@@ -61,6 +61,7 @@ python3 new_energy_agent.py doctor
 python3 new_energy_agent.py self-test
 python3 new_energy_agent.py predict --demo --group source_group --out /tmp/metrics.json
 python3 new_energy_agent.py quality datasets/processed/LGM50_cell03_by_cycle.csv --target capacity_ah_max --group cycle --out /tmp/quality.json
+python3 scripts/run_material_demo.py
 ```
 
 运行 Python 测试：

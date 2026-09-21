@@ -1,0 +1,18 @@
+{
+  "dataset": "/root/new-energy-agent/datasets/raw/NMC_numerical_new.csv",
+  "records": 168,
+  "targets": [
+    "IC",
+    "EC"
+  ],
+  "reports": [
+    "demo_run/material_demo/reports/quality.json",
+    "demo_run/material_demo/reports/ic_metrics.json",
+    "demo_run/material_demo/reports/ec_metrics.json"
+  ],
+  "status": "completed",
+  "limitations": [
+    "No explicit DFT/MP ID columns in this public fixture; DFT feature join remains a separately gated step.",
+    "Random split is a smoke test, not chemical extrapolation validation."
+  ]
+}
