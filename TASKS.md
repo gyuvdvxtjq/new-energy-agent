@@ -26,6 +26,7 @@
 - [x] 添加数值特征 Random Forest 基线和分组切分支持
 - [x] 记录 GitHub、LinuxDo 和 DeepModeling 的参考项目与设计经验
 - [x] 添加带 SHA256 和来源清单的 Zenodo 公共数据下载器
+- [x] 用公开 Zenodo 电芯数据验证下载、哈希和非标准 CSV 表头处理
 
 ## 待完成
 

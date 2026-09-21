@@ -10,8 +10,10 @@ from collections import Counter
 from pathlib import Path
 
 
-def inspect_csv(path: Path, target: str | None) -> dict:
+def inspect_csv(path: Path, target: str | None, header_line: int = 1) -> dict:
     with path.open(newline="", encoding="utf-8-sig") as handle:
+        for _ in range(max(header_line - 1, 0)):
+            next(handle, "")
         reader = csv.DictReader(handle)
         fields = reader.fieldnames or []
         rows = list(reader)
@@ -38,9 +40,10 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("csv_path", type=Path)
     parser.add_argument("--target")
+    parser.add_argument("--header-line", type=int, default=1)
     parser.add_argument("--out", type=Path)
     args = parser.parse_args()
-    result = inspect_csv(args.csv_path, args.target)
+    result = inspect_csv(args.csv_path, args.target, args.header_line)
     output = json.dumps(result, ensure_ascii=False, indent=2) + "\n"
     if args.out:
         args.out.parent.mkdir(parents=True, exist_ok=True)
