@@ -79,3 +79,10 @@ python3 scripts/run_material_demo.py
 ```bash
 python3 -m unittest discover -s tests -v
 ```
+
+GitHub 推送使用项目 `.env` 中的 `GH_KEY`：
+
+```bash
+chmod 600 .env
+./scripts/push_github.sh
+```
