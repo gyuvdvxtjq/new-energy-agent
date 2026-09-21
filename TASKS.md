@@ -24,6 +24,7 @@
 - [x] 登记公开电池、DFT 和基准数据源
 - [x] 写入电池材料验证数据契约草案
 - [x] 添加数值特征 Random Forest 基线和分组切分支持
+- [x] 记录 GitHub、LinuxDo 和 DeepModeling 的参考项目与设计经验
 
 ## 待完成
 
