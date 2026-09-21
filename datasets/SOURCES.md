@@ -43,6 +43,13 @@
 - 限制：该数据集没有 Materials Project ID 或显式 DFT 特征，不能把晶格/元素数值列称为 DFT 特征；需要额外的结构映射后才能和 MP/JARVIS 合并。
 - 状态：已下载，保存 SHA256 manifest。
 
+## Materials Project 实际查询记录
+
+- 查询结果：`reports/mp-149.json`
+- 合并结果：`reports/ncm_mp_features.csv`
+- 合并 manifest：`reports/ncm_mp_features.manifest.json`
+- 说明：NCM 数据缺少掺杂元素名称和 MP ID；仅对 `M==0` 行采用 O₂ 假设，并从 `Li-Ni-Co-Mn-O` 候选中按组成距离选择候选，状态为需人工复核。
+
 ## DFT 与结构数据
 
 ### Materials Project

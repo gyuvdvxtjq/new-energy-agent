@@ -1,0 +1,10 @@
+{
+  "input": "datasets/raw/NMC_numerical_new.csv",
+  "output": "reports/ncm_mp_features.csv",
+  "queried_rows": 2,
+  "matched_rows": 2,
+  "mp_candidate_count": 11,
+  "mapping_rule": "only M==0; oxygen fixed at O2; nearest candidate within Li-Ni-Co-Mn-O chemical system; unknown dopants skipped",
+  "mapping_status": "approximate_requires_human_review",
+  "evidence_status": "database_native"
+}

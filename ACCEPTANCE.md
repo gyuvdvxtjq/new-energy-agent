@@ -22,6 +22,8 @@
 | MP 可选接入 | `query_materials_project.py` | 无 key 时明确提示，不保存密钥 |
 | 真实本地端到端演示 | `demo_run/` | 公开 Zenodo 电池数据完成质量检查和分组性能基线 |
 | 材料级预测演示 | `demo_run/material_workflow.md` | 168 条公开 NCM 材料记录，IC/EC 回归基线已运行 |
+| Materials Project 实际查询 | `reports/mp-149.json` | 使用项目 `.env` 成功返回 MP 数据 |
+| MP 特征合并 | `reports/ncm_mp_features.csv` | 2 条无掺杂 NCM 记录合并 MP 特征，近似映射并标记人工复核 |
 
 ## 项目交付内容
 
@@ -37,8 +39,9 @@
 
 ## 外部条件
 
-- Materials Project 查询需要用户在本机设置 `MP_API_KEY`，项目不会保存或读取聊天中的密钥。
+- Materials Project 查询需要用户在本机项目 `.env` 设置 `MP_API_KEY`；项目自动读取它，不会把密钥写入 Git。
 - `pymatgen`/`mp-api` 是可选依赖；核心工具不依赖它们。
 - 真实 SSH/Slurm 需要用户自己的主机、账户、队列和服务器环境；项目只在确认后生成/执行任务。
 - Figshare 材料级数据页面的自动下载接口当前返回 HTTP 403；来源和字段已登记，项目使用 Zenodo 电池数据完成本地验证，并保留 Figshare 作为可选材料级扩展。
 - `demo_run/` 的指标是电芯循环 smoke test，不应解释为材料组成或 DFT 特征的科学结论。
+- NCM→MP 合并只对 `M==0` 行执行，并固定 O₂、按化学体系组成距离选候选；结果状态为 `nearest_chemsys_candidate_requires_review`，不能直接视为精确结构同一。

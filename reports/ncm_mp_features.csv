@@ -1,0 +1,3 @@
+source_row,formula_assumption,mp_material_id,mp_formula,mp_band_gap,mp_formation_energy_per_atom,mp_energy_above_hull,composition_distance,mapping_status
+129,Li1Ni0.336Co0.333Mn0.331O2,mp-aaacrolq,Li3MnCoNiO6,1.1081000000000003,-1.8258960048275863,0.04906116708333741,0.0008897565210026101,nearest_chemsys_candidate_requires_review
+132,Li1Ni0.332Co0.344Mn0.324O2,mp-aaacrolq,Li3MnCoNiO6,1.1081000000000003,-1.8258960048275863,0.04906116708333741,0.0035590260840104295,nearest_chemsys_candidate_requires_review

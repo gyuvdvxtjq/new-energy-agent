@@ -1,0 +1,107 @@
+{
+  "source": "Materials Project",
+  "query": {
+    "formula": null,
+    "material_id": "mp-149"
+  },
+  "endpoint": "https://api.materialsproject.org/materials/summary/",
+  "evidence_status": "database_native",
+  "records": [
+    {
+      "band_gap": 0.6102999999999996,
+      "formation_energy_per_atom": 0.0,
+      "energy_above_hull": 0.0,
+      "formula_pretty": "Si",
+      "material_id": "mp-aaaaaaft",
+      "structure": {
+        "@module": "pymatgen.core.structure",
+        "@class": "Structure",
+        "charge": 0.0,
+        "lattice": {
+          "matrix": [
+            [
+              3.333573,
+              0.0,
+              1.924639
+            ],
+            [
+              1.111191,
+              3.142924,
+              1.924639
+            ],
+            [
+              0.0,
+              0.0,
+              3.849278
+            ]
+          ],
+          "pbc": [
+            true,
+            true,
+            true
+          ],
+          "a": 3.8492784033699095,
+          "b": 3.8492794116013456,
+          "c": 3.849278,
+          "alpha": 60.00001213094421,
+          "beta": 60.00000346645984,
+          "gamma": 60.0000109754579,
+          "volume": 40.32952684741405
+        },
+        "properties": {},
+        "sites": [
+          {
+            "species": [
+              {
+                "element": "Si",
+                "occu": 1.0
+              }
+            ],
+            "abc": [
+              0.875,
+              0.875,
+              0.875
+            ],
+            "properties": {},
+            "label": "Si",
+            "xyz": [
+              3.8891685,
+              2.7500584999999997,
+              6.7362365
+            ]
+          },
+          {
+            "species": [
+              {
+                "element": "Si",
+                "occu": 1.0
+              }
+            ],
+            "abc": [
+              0.125,
+              0.125,
+              0.125
+            ],
+            "properties": {},
+            "label": "Si",
+            "xyz": [
+              0.5555955,
+              0.3928655,
+              0.9623195
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "api_version": "0.87.3.dev11+ga5415ca70",
+    "time_stamp": "2026-09-21T13:59:00.562736+00:00",
+    "total_doc": 1,
+    "facet": null,
+    "max_limit": 1000,
+    "default_fields": [
+      "material_id"
+    ]
+  }
+}

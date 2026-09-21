@@ -43,6 +43,8 @@
 - [x] 添加统一 CLI 和自动化测试
 - [x] 完成公开 NCM 材料数据的真实 IC/EC 端到端演示
 - [x] 添加一键材料演示和 Agent 会话记录
+- [x] 使用项目 .env 实际查询 Materials Project
+- [x] 生成 MP 特征合并表和近似映射 manifest
 
 新增完成：
 
