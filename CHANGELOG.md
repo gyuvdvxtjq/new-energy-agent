@@ -2,6 +2,7 @@
 
 ## 2026-09-21
 
+- 重写 README，补充项目定位、能力地图、架构、安装、真实材料演示、Materials Project 配置、远程计算确认边界、评估、限制和开源社区参考。
 - 建立本地 Codex 科研 Agent 项目规格和架构决策。
 - 添加 Codex/Claude Code Skills、Commands 和科研角色文件。
 - 添加工作区初始化、CSV 数据契约、分组预测基线和远程计算计划脚本。
