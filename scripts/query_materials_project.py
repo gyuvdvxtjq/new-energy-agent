@@ -3,7 +3,23 @@
 from __future__ import annotations
 import argparse, json, os
 from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+
+def load_project_env() -> None:
+    env_path = ROOT / ".env"
+    if not env_path.exists():
+        return
+    for line in env_path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key, value = key.strip(), value.strip().strip("\"'")
+        if key and key not in os.environ:
+            os.environ[key] = value
 def main() -> int:
+    load_project_env()
     p=argparse.ArgumentParser(); p.add_argument('--formula'); p.add_argument('--material-id'); p.add_argument('--out',type=Path,required=True); a=p.parse_args()
     if not os.environ.get('MP_API_KEY'): raise SystemExit('MP_API_KEY is not set. Set it in your shell; it is never written to this project.')
     try:

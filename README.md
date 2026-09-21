@@ -28,6 +28,16 @@ python3 -m pip install -r requirements.txt
 
 `pymatgen` 和 `mp-api` 是可选的材料结构与 Materials Project 适配依赖，不会在安装 Skills 时强制安装。
 
+项目密钥放在根目录 `.env`（已加入 `.gitignore`，不会提交到 Git）：
+
+```bash
+cp .env.example .env
+chmod 600 .env
+# 编辑 .env，填写 MP_API_KEY=...
+```
+
+`query_materials_project.py` 会自动读取项目 `.env`；进程环境变量优先于文件配置。不要把真实密钥写入 README、日志、报告或聊天记录。
+
 然后在项目目录中使用 Codex：
 
 ```text

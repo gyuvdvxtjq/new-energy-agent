@@ -33,6 +33,7 @@ def main() -> int:
     for module in ("numpy", "pandas", "sklearn", "pymatgen", "mp_api"):
         status = "available" if importlib.util.find_spec(module) else "optional-missing"
         print(f"python.{module}: {status}")
+    print(f"project.env: {'present' if (ROOT / '.env').exists() else 'absent'}")
     print("status: ok")
     return 0
 
