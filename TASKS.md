@@ -56,4 +56,4 @@
 
 - [x] 修复 GitHub 上传脚本未导出认证变量的问题；大小写密钥配置均通过模拟认证验证。
 - [x] GitHub API 实测密钥有效、目标仓库可访问，返回 push 权限。
-- [ ] 推送当前 main 并核对远端提交。
+- [x] 推送 main 成功（GitHub 返回 new branch）；使用 GitHub API 核对远端提交。
