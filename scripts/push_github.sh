@@ -6,7 +6,7 @@ if [[ ! -f .env ]]; then echo '.env is missing' >&2; exit 2; fi
 set -a
 source .env
 set +a
-PUSH_KEY="${GH_KEY:-${gh_key:-}}"
+export PUSH_KEY="${GH_KEY:-${gh_key:-}}"
 if [[ -z "$PUSH_KEY" ]]; then echo 'GH_KEY/gh_key is missing from project .env' >&2; exit 2; fi
 ASKPASS="$(mktemp)"
 trap 'rm -f "$ASKPASS"; unset PUSH_KEY' EXIT
