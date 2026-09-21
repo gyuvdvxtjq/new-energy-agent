@@ -1,0 +1,31 @@
+{
+  "task_type": "regression",
+  "target": "capacity_ah",
+  "features": [
+    "step_time_s",
+    "current_abs_a",
+    "voltage_v",
+    "temperature_c"
+  ],
+  "rows_total": 6315,
+  "rows_used": 6315,
+  "rows_train": 4099,
+  "rows_test": 2216,
+  "split_rule": "GroupShuffleSplit by cycle",
+  "metrics": {
+    "mae": 0.7656307028720272,
+    "rmse": 1.1941234122016304,
+    "r2": 0.5235189141718983
+  },
+  "feature_importance": {
+    "step_time_s": 0.0438758321263506,
+    "current_abs_a": 0.5516937947915552,
+    "voltage_v": 0.24461916542851242,
+    "temperature_c": 0.15981120765358173
+  },
+  "limitations": [
+    "Numeric features only; categorical formula and structure features are not encoded.",
+    "A random split is not evidence of chemical or structural extrapolation.",
+    "Check source, material, batch, protocol, and structure-family leakage before interpretation."
+  ]
+}

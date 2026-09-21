@@ -1,0 +1,58 @@
+{
+  "score": 100.0,
+  "max_score": 100,
+  "checks": [
+    {
+      "name": "project_spec",
+      "weight": 10,
+      "passed": true,
+      "evidence": "PROJECT_SPEC.md"
+    },
+    {
+      "name": "workflow_commands",
+      "weight": 10,
+      "passed": true,
+      "evidence": "commands/*.md"
+    },
+    {
+      "name": "provenance",
+      "weight": 15,
+      "passed": true,
+      "evidence": "datasets/SOURCES.md + raw manifest"
+    },
+    {
+      "name": "data_quality",
+      "weight": 15,
+      "passed": true,
+      "evidence": "scripts/data_quality.py"
+    },
+    {
+      "name": "leakage_control",
+      "weight": 15,
+      "passed": true,
+      "evidence": "group-aware baseline"
+    },
+    {
+      "name": "reproducibility",
+      "weight": 15,
+      "passed": true,
+      "evidence": "tests + self_test"
+    },
+    {
+      "name": "compute_approval",
+      "weight": 10,
+      "passed": true,
+      "evidence": "compute plan approval gate"
+    },
+    {
+      "name": "dft_parser",
+      "weight": 10,
+      "passed": true,
+      "evidence": "scripts/parse_dft_output.py"
+    }
+  ],
+  "interpretation": "tooling and workflow readiness score; not a scientific validity score",
+  "limitations": [
+    "Does not replace expert review or external compute validation."
+  ]
+}

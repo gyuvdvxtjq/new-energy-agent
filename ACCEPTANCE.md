@@ -20,6 +20,7 @@
 | DFT 输出解析 | `parse_dft_output.py` | OUTCAR 标量 smoke test 通过 |
 | 远程计算安全边界 | `compute_plan.py` | 只生成计划，不提交 SSH/Slurm |
 | MP 可选接入 | `query_materials_project.py` | 无 key 时明确提示，不保存密钥 |
+| 真实本地端到端演示 | `demo_run/` | 公开 Zenodo 电池数据完成质量检查和分组性能基线 |
 
 ## 项目交付内容
 
@@ -39,3 +40,4 @@
 - `pymatgen`/`mp-api` 是可选依赖；核心工具不依赖它们。
 - 真实 SSH/Slurm 需要用户自己的主机、账户、队列和服务器环境；项目只在确认后生成/执行任务。
 - Figshare 材料级数据页面的自动下载接口当前返回 HTTP 403；来源和字段已登记，项目使用 Zenodo 电池数据完成本地验证，并保留 Figshare 作为可选材料级扩展。
+- `demo_run/` 的指标是电芯循环 smoke test，不应解释为材料组成或 DFT 特征的科学结论。

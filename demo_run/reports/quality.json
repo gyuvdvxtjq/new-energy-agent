@@ -1,0 +1,36 @@
+{
+  "input": "demo_run/datasets/cycle_ml.csv",
+  "rows": 6315,
+  "columns": [
+    "cycle",
+    "step_time_s",
+    "capacity_ah",
+    "current_abs_a",
+    "voltage_v",
+    "temperature_c",
+    "source_group"
+  ],
+  "target": "capacity_ah",
+  "groups": [
+    "cycle"
+  ],
+  "missing": {
+    "cycle": 0,
+    "step_time_s": 0,
+    "capacity_ah": 0,
+    "current_abs_a": 0,
+    "voltage_v": 0,
+    "temperature_c": 0,
+    "source_group": 0
+  },
+  "duplicate_rows": 0,
+  "warnings": [],
+  "group_cardinality": {
+    "cycle": 5
+  },
+  "identifier_like_columns": [],
+  "target_summary": {
+    "non_null": 6315,
+    "unique": 3878
+  }
+}
