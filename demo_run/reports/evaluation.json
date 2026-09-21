@@ -1,5 +1,5 @@
 {
-  "engineering_readiness": 88.0,
+  "engineering_readiness": 96.0,
   "scientific_demo_readiness": 88.0,
   "max_score": 100,
   "checks": [
@@ -60,8 +60,8 @@
     {
       "name": "dft_feature_join",
       "weight": 10,
-      "passed": false,
-      "evidence": "requires a real MP/JARVIS/DFT feature artifact"
+      "passed": true,
+      "evidence": "reports/ncm_mp_features.csv; mapping is approximate and requires human review"
     },
     {
       "name": "live_remote_compute",
