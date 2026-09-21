@@ -7,10 +7,13 @@
 ### All cycling and rate performance datasets
 
 - URL: https://springernature.figshare.com/articles/dataset/All_cycling_and_rate_performance_datasets/24116592
-- 内容：层状正极材料的元素组成、合成条件、循环/倍率性能等表格字段。
+- 内容：层状正极材料的元素组成、合成条件、循环/倍率性能等表格字段；论文说明提取了 5,265 条属性记录，来自 1,747 篇文章。
 - 用途：材料组成与实验性能预测验证。
 - 风险：不同论文的测试电流、截止电压、温度和循环终点不一致，必须作为特征或分组字段保留，不能直接混合成无条件标签。
-- 状态：待下载和许可证核验。
+- 相关论文： https://www.nature.com/articles/s41597-024-03196-1
+- 相关抽取代码： https://github.com/GGNoWayBack/cathodedataextractor
+- 许可证：页面标注 CC0，下载时仍需保存当前记录的许可证信息。
+- 状态：首选材料级验证数据，待下载和字段核验。
 
 ## 电芯级老化数据
 
