@@ -41,7 +41,7 @@ def run(df: pd.DataFrame, target: str, group: str | None, test_size: float) -> d
     feature_columns = [
         column
         for column in df.select_dtypes(include=["number"]).columns
-        if column != target
+        if column != target and column != group
     ]
     if not feature_columns:
         raise ValueError("no numeric feature columns found")
