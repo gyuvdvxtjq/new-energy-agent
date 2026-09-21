@@ -20,6 +20,14 @@
 ./install.sh
 ```
 
+数据基线脚本需要 Python、pandas、numpy 和 scikit-learn；可按当前机器情况安装：
+
+```bash
+python3 -m pip install -r requirements.txt
+```
+
+`pymatgen` 和 `mp-api` 是可选的材料结构与 Materials Project 适配依赖，不会在安装 Skills 时强制安装。
+
 然后在项目目录中使用 Codex：
 
 ```text

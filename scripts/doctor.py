@@ -3,6 +3,7 @@
 
 from pathlib import Path
 import sys
+import importlib.util
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -29,6 +30,9 @@ def main() -> int:
         return 1
     print(f"project: {ROOT}")
     print(f"required_files: {len(REQUIRED)}")
+    for module in ("numpy", "pandas", "sklearn", "pymatgen", "mp_api"):
+        status = "available" if importlib.util.find_spec(module) else "optional-missing"
+        print(f"python.{module}: {status}")
     print("status: ok")
     return 0
 
