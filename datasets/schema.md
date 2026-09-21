@@ -16,7 +16,7 @@
 | `synthesis_temperature_c` | 输入 | 合成温度，需保留原单位和转换记录 |
 | `synthesis_time_h` | 输入 | 合成时间 |
 | `particle_size_nm` | 输入 | 如文献提供 |
-| `df t_formation_energy_ev_atom` | 输入 | 数据库或计算 DFT 特征，需标来源 |
+| `dft_formation_energy_ev_atom` | 输入 | 数据库或计算 DFT 特征，需标来源 |
 | `dft_band_gap_ev` | 输入 | DFT 特征，需标泛函/来源 |
 | `dft_migration_barrier_ev` | 输入 | 若存在，需标计算方法 |
 | `test_temperature_c` | 条件 | 电化学测试温度 |
