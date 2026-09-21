@@ -47,3 +47,9 @@ python3 -m pip install -r requirements.txt
 - `DECISIONS.md`：已经确认的决策
 - `REQUIREMENTS.md`：功能与验收标准
 - `TASKS.md`：当前任务状态
+
+## 本地自检
+
+```bash
+python3 scripts/self_test.py
+```
