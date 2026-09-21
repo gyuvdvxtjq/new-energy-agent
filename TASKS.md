@@ -25,6 +25,7 @@
 - [x] 写入电池材料验证数据契约草案
 - [x] 添加数值特征 Random Forest 基线和分组切分支持
 - [x] 记录 GitHub、LinuxDo 和 DeepModeling 的参考项目与设计经验
+- [x] 添加带 SHA256 和来源清单的 Zenodo 公共数据下载器
 
 ## 待完成
 
