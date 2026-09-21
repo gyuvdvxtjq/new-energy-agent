@@ -53,3 +53,18 @@ python3 -m pip install -r requirements.txt
 ```bash
 python3 scripts/self_test.py
 ```
+
+统一 CLI：
+
+```bash
+python3 new_energy_agent.py doctor
+python3 new_energy_agent.py self-test
+python3 new_energy_agent.py predict --demo --group source_group --out /tmp/metrics.json
+python3 new_energy_agent.py quality datasets/processed/LGM50_cell03_by_cycle.csv --target capacity_ah_max --group cycle --out /tmp/quality.json
+```
+
+运行 Python 测试：
+
+```bash
+python3 -m unittest discover -s tests -v
+```
