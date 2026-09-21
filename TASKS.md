@@ -27,6 +27,7 @@
 - [x] 记录 GitHub、LinuxDo 和 DeepModeling 的参考项目与设计经验
 - [x] 添加带 SHA256 和来源清单的 Zenodo 公共数据下载器
 - [x] 用公开 Zenodo 电芯数据验证下载、哈希和非标准 CSV 表头处理
+- [x] 添加电池循环 CSV 到逐循环派生表的确定性转换器
 
 ## 待完成
 
