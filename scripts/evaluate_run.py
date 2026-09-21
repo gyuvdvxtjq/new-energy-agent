@@ -16,7 +16,11 @@ def main() -> int:
     check('reproducibility',15,(r/'tests'/'test_toolkit.py').exists() and (r/'scripts'/'self_test.py').exists(),'tests + self_test')
     check('compute_approval',10,'waiting_user_approval' in (r/'scripts'/'compute_plan.py').read_text(),'compute plan approval gate')
     check('dft_parser',10,(r/'scripts'/'parse_dft_output.py').exists(),'scripts/parse_dft_output.py')
-    score=round(sum(x['weight'] for x in checks if x['passed'])/sum(x['weight'] for x in checks)*100,1)
-    result={'score':score,'max_score':100,'checks':checks,'interpretation':'tooling and workflow readiness score; not a scientific validity score','limitations':['Does not replace expert review or external compute validation.']}
+    check('material_performance_dataset',10,any((r/'datasets'/'raw').glob('NMC_numerical_new.csv')),'NCM-ML public material dataset')
+    check('dft_feature_join',10,any((r/'demo_run').glob('**/*dft*')),'requires a real MP/JARVIS/DFT feature artifact')
+    check('live_remote_compute',5,any((r/'calculations').glob('**/parsed_result.json')),'requires confirmed SSH/Slurm result')
+    engineering=round(sum(x['weight'] for x in checks if x['passed'])/sum(x['weight'] for x in checks)*100,1)
+    scientific=round(sum(x['weight'] for x in checks if x['passed'] and x['name'] not in {'dft_feature_join','live_remote_compute'})/sum(x['weight'] for x in checks)*100,1)
+    result={'engineering_readiness':engineering,'scientific_demo_readiness':scientific,'max_score':100,'checks':checks,'interpretation':'readiness score, not a scientific validity score; missing DFT join and remote compute are explicit failures','limitations':['Does not replace expert review, a real Materials Project query, or external compute validation.']}
     a.out.parent.mkdir(parents=True,exist_ok=True); a.out.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n'); print(json.dumps(result,ensure_ascii=False,indent=2)); return 0 if score>=80 else 1
 if __name__=='__main__': raise SystemExit(main())

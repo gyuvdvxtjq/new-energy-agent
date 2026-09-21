@@ -31,6 +31,18 @@
 - 用途：按温度、SOC 和工况进行容量衰减建模。
 - 边界：适合验证时序和实验设计，不适合声称跨材料体系泛化。
 
+## 材料级 NMC 正极性能
+
+### NCM-ML public dataset
+
+- Repository: https://github.com/thepowerligand/NCM-ML
+- File: `NMC_numerical_new.csv`
+- Linked paper/data description: https://pmc.ncbi.nlm.nih.gov/articles/PMC8461773/
+- 内容：168 个掺杂镍钴锰正极材料的数值组成、晶格参数、测试条件、初始放电容量（IC）和第 50 周期放电容量（EC）。
+- 用途：真实材料级性能预测 smoke test；可以验证字段契约、回归基线和指标输出。
+- 限制：该数据集没有 Materials Project ID 或显式 DFT 特征，不能把晶格/元素数值列称为 DFT 特征；需要额外的结构映射后才能和 MP/JARVIS 合并。
+- 状态：已下载，保存 SHA256 manifest。
+
 ## DFT 与结构数据
 
 ### Materials Project

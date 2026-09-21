@@ -1,5 +1,6 @@
 {
-  "score": 100.0,
+  "engineering_readiness": 88.0,
+  "scientific_demo_readiness": 88.0,
   "max_score": 100,
   "checks": [
     {
@@ -49,10 +50,28 @@
       "weight": 10,
       "passed": true,
       "evidence": "scripts/parse_dft_output.py"
+    },
+    {
+      "name": "material_performance_dataset",
+      "weight": 10,
+      "passed": true,
+      "evidence": "NCM-ML public material dataset"
+    },
+    {
+      "name": "dft_feature_join",
+      "weight": 10,
+      "passed": false,
+      "evidence": "requires a real MP/JARVIS/DFT feature artifact"
+    },
+    {
+      "name": "live_remote_compute",
+      "weight": 5,
+      "passed": false,
+      "evidence": "requires confirmed SSH/Slurm result"
     }
   ],
-  "interpretation": "tooling and workflow readiness score; not a scientific validity score",
+  "interpretation": "readiness score, not a scientific validity score; missing DFT join and remote compute are explicit failures",
   "limitations": [
-    "Does not replace expert review or external compute validation."
+    "Does not replace expert review, a real Materials Project query, or external compute validation."
   ]
 }
