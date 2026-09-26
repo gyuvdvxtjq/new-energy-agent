@@ -1,0 +1,16 @@
+# NCM 锂电正极配方-容量数据集 profile（预测链演示）
+material:
+  name: "NCM 系正极配方数据集"
+  source: "datasets/raw/NMC_numerical_new.csv"   # Li/Ni/Co/Mn 配比 → 电化学指标
+  structure: null
+compute:
+  engine: abacus
+  template: null
+budget:
+  max_atoms: 0
+prediction:
+  target: "IC"                    # 初始容量 (mAh/g)，v1 demo 同口径
+  group: null                     # 无批次/来源列——随机切分，仅 smoke test
+notes: >
+  数据集以元素含量数值列给出（无化学式列），features.derive 自动跳过推导。
+  目标 IC 为演示用途，随机切分结论不得外推为材料泛化能力。

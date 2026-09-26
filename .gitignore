@@ -3,18 +3,16 @@ __pycache__/
 .venv/
 .env
 .DS_Store
+*.egg-info/
 
-# Generated task state and runtime artifacts
+# v2 runtime artifacts: task state and audit logs are ephemeral, NOT committed.
+# Evidence (approvals/ confirmations, evidence/ manifests) IS committed: it is the audit trail.
+workspace/tasks/*
+workspace/logs/*
+!workspace/approvals/.gitkeep
+!workspace/evidence/.gitkeep
+
+# v1 legacy runtime artifacts
 workspace/current_task.yaml
 workspace/task_log.md
 workspace/handoffs/*
-approvals/*.json
-approvals/*.md
-logs/*
-reports/*
-datasets/raw/*
-datasets/processed/*
-calculations/*
-extracted/*
-papers/*
-structures/*

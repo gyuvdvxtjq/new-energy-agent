@@ -1,0 +1,18 @@
+# ABACUS SCF 参数模板（LCAO 口径，供 write_inputs 消费）
+engine: abacus
+basis_type: lcao
+ecutwfc: 50
+scf_nmax: 100
+scf_thr: 1.0e-6
+ntype: 1
+symmetry: 0
+# 赝势文件从 fixtures 随任务复制（轨道文件由 STRU 的 NUMERICAL_ORBITAL 引用自动解析复制）
+pseudo_files:
+  - Si.pz-vbc.UPF
+# 输出解析提示（parse_output 使用；marker 支持多版本 ABACUS 措辞）
+output:
+  log_candidates: ["OUT.ABACUS/running_scf.log", "running_scf.log"]
+  converged_marker:
+    - "charge density convergence is achieved"   # ABACUS 3.x LCAO
+    - "convergence has been achieved"            # 旧版措辞
+  energy_pattern: "final etot is"

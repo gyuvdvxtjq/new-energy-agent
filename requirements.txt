@@ -1,8 +1,10 @@
-# Core deterministic data workflow dependencies.
+# neagent v2 runtime + core
+pyyaml>=6.0
 numpy>=1.24
 pandas>=2.0
 scikit-learn>=1.3
 
-# Optional material structure support:
-# pymatgen>=2024.1
-# mp-api>=0.40
+# Optional:
+# paramiko>=3.0        # SSH channel (password/key auth) — pip install neagent[ssh]
+# pymatgen>=2024.1     # structure features (roadmap)
+# mp-api>=0.40         # same-calculator MP comparison (roadmap)

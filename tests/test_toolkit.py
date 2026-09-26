@@ -1,4 +1,9 @@
+"""CLI smoke tests through subprocess (the human/CI channel)."""
+
+from __future__ import annotations
+
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -7,27 +12,54 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
+
 class ToolkitTests(unittest.TestCase):
     def run_cli(self, *args):
-        return subprocess.run([sys.executable, str(ROOT / "new_energy_agent.py"), *args], cwd=ROOT, text=True, capture_output=True)
+        env = dict(os.environ)
+        env["PYTHONPATH"] = str(ROOT / "src")
+        return subprocess.run(
+            [sys.executable, "-m", "neagent.cli", *args],
+            cwd=ROOT, text=True, capture_output=True, env=env)
 
-    def test_doctor(self):
-        self.assertEqual(self.run_cli("doctor").returncode, 0)
+    def test_selfcheck(self):
+        r = self.run_cli("selfcheck")
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertIn("ALL GUARDRAIL CHECKS PASSED", r.stdout)
 
     def test_demo_prediction(self):
         with tempfile.TemporaryDirectory() as d:
-            result = self.run_cli("predict", "--demo", "--group", "source_group", "--out", str(Path(d) / "metrics.json"))
-            self.assertEqual(result.returncode, 0, result.stderr)
-            payload = json.loads((Path(d) / "metrics.json").read_text())
-            self.assertIn("metrics", payload)
-            self.assertEqual(payload["split_rule"], "GroupShuffleSplit by source_group")
+            r = self.run_cli("demo", "predict", "--workspace", d)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            payload = json.loads(r.stdout[r.stdout.index("{"):])
+            self.assertEqual(payload["state"], "needs_review")
+            self.assertIn("mae", payload["result"])
 
-    def test_dft_parse(self):
+    def test_paid_submit_blocked_via_cli(self):
         with tempfile.TemporaryDirectory() as d:
-            d = Path(d); raw = d / "OUTCAR"; out = d / "parsed.json"
-            raw.write_text("free energy TOTEN = -1.25 eV\nE-fermi : 4.2\nvolume of cell : 88.0\n")
-            result = self.run_cli("parse-dft", str(raw), "--out", str(out))
-            self.assertEqual(result.returncode, 0, result.stderr)
-            self.assertEqual(json.loads(out.read_text())["values"]["energy_eV"], -1.25)
+            self.run_cli("task", "new", "smoke1", "--workflow", "compute",
+                         "--title", "smoke", "--workspace", d)
+            self.run_cli("task", "plan", "smoke1", "--workspace", d)
+            r = self.run_cli("dispatch", "bohr.submit", "task_id=smoke1",
+                             "--workspace", d)
+            self.assertNotEqual(r.returncode, 0)
+            combined = (r.stdout + r.stderr).lower()
+            self.assertIn("gate", combined)   # blocked by the approval gate
+            # state unchanged by the blocked attempt
+            r = self.run_cli("task", "status", "smoke1", "--workspace", d)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertIn("planned", r.stdout)
 
-if __name__ == "__main__": unittest.main()
+    def test_status_readable_after_terminal(self):
+        with tempfile.TemporaryDirectory() as d:
+            self.run_cli("task", "new", "smoke2", "--workspace", d)
+            self.run_cli("task", "plan", "smoke2", "--workspace", d)
+            self.run_cli("task", "execute", "smoke2", "--workspace", d)
+            self.run_cli("task", "finish", "smoke2", "--workspace", d)
+            self.run_cli("task", "cancel", "smoke2", "--workspace", d)
+            r = self.run_cli("task", "status", "smoke2", "--workspace", d)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertIn("cancelled", r.stdout)
+
+
+if __name__ == "__main__":
+    unittest.main()

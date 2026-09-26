@@ -1,0 +1,19 @@
+# Si DFT 交叉验证演示 profile（默认随仓库）
+material:
+  name: "Silicon (mp-149 结构)"
+  source: null                    # 无本地 CSV，预测链不适用
+  structure: "tests/fixtures/abacus_si_example/STRU"   # 结构来源：本地文件
+  mp_id: "mp-149"                 # 交叉验证对照：reports/mp-149.json
+compute:
+  engine: abacus
+  template: "profiles/templates/abacus_scf_lcao.yaml"
+  machine_hint: auto
+budget:
+  max_atoms: 120
+  estimated_cost_note: "c2_m8_cpu ¥0.16/时 × 约1分钟 ≈ ¥0.003"
+prediction:
+  target: null
+  group: null
+notes: >
+  首次链路验证用官方 LDA/LCAO 示例口径；与 MP (PBE) 对比时差异属预期，
+  报告必须注明口径。正式版切换 PBE 赝势再谈数值一致性。
