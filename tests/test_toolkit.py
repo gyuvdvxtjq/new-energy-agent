@@ -19,7 +19,8 @@ class ToolkitTests(unittest.TestCase):
         env["PYTHONPATH"] = str(ROOT / "src")
         return subprocess.run(
             [sys.executable, "-m", "neagent.cli", *args],
-            cwd=ROOT, text=True, capture_output=True, env=env)
+            cwd=ROOT, text=True, capture_output=True, env=env,
+            encoding="utf-8", errors="replace")  # Windows GBK console must not crash us
 
     def test_selfcheck(self):
         r = self.run_cli("selfcheck")
@@ -31,15 +32,15 @@ class ToolkitTests(unittest.TestCase):
             r = self.run_cli("demo", "predict", "--workspace", d)
             self.assertEqual(r.returncode, 0, r.stderr)
             payload = json.loads(r.stdout[r.stdout.index("{"):])
-            self.assertEqual(payload["state"], "needs_review")
+            self.assertEqual(payload["state"], "completed")  # demo runs to done
             self.assertIn("mae", payload["result"])
 
-    def test_paid_submit_blocked_via_cli(self):
+    def test_paid_run_blocked_via_cli(self):
         with tempfile.TemporaryDirectory() as d:
             self.run_cli("task", "new", "smoke1", "--workflow", "compute",
                          "--title", "smoke", "--workspace", d)
             self.run_cli("task", "plan", "smoke1", "--workspace", d)
-            r = self.run_cli("dispatch", "bohr.submit", "task_id=smoke1",
+            r = self.run_cli("dispatch", "dft.run", "task_id=smoke1",
                              "--workspace", d)
             self.assertNotEqual(r.returncode, 0)
             combined = (r.stdout + r.stderr).lower()

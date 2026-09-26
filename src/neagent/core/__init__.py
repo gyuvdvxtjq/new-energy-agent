@@ -1,1 +1,1 @@
-"""Deterministic core: data/features/models (predict chain), bohr/sshrun (compute), evidence."""
+"""Deterministic core: data/features/models (predict chain), abacus/sshrun (compute), evidence."""

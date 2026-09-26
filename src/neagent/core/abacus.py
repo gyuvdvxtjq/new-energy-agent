@@ -1,51 +1,28 @@
-"""Bohrium integration: plan → dry-run → (gated) submit → status → fetch → parse.
+"""ABACUS integration: plan (input generation) → (gated) SSH execution → parse.
 
 Red lines enforced HERE, not in prompts:
-  * every WRITE operation against a Bohrium job requires that job_id to be in
-    the task's `job_ids` whitelist (jobs created BY this project) — the runtime
-    refuses to touch anything else. Node operations do not exist in this module.
-  * real submission is only reachable through the tool gateway with the
-    approval gate satisfied; dry-run is always allowed.
-  * BOHRIUM_PROJECT_ID comes from the environment (.env), never hardcoded.
+  * remote execution happens ONLY on the user-provided SSH machine
+    (core/sshrun.py, credentials from the environment), inside the fixed
+    namespace ~/neagent/<task_id>/ — the runtime never touches paths outside
+    its own namespace on that machine
+  * execution is only reachable through the tool gateway with the approval
+    gate satisfied (dft.plan binds the approval to the exact input content)
+  * there is no cloud-job API surface: no submit/status/fetch of remote
+    platform jobs, no project ids, no billing credentials in code
 """
 
 from __future__ import annotations
 
-import json
-import os
 import re
 import shutil
-import subprocess
 from pathlib import Path
 from typing import Any
 
 from ..profiles import MaterialProfile
 
-IMAGE_ABACUS = "registry.dp.tech/dptech/abacus:3.1.0"
 
-
-class BohrError(RuntimeError):
+class AbacusError(RuntimeError):
     pass
-
-
-# --------------------------------------------------------------------------
-# machine routing: agent's resource decision, recorded in the approval file
-# --------------------------------------------------------------------------
-def route_machine(n_atoms: int, kind: str = "dft") -> str:
-    """DFT is CPU-bound (MPI); MLIP inference would be GPU-bound (roadmap)."""
-    if kind != "dft":
-        raise ValueError(f"unsupported compute kind '{kind}' (mlip is roadmap)")
-    if n_atoms <= 20:
-        return "c2_m8_cpu"      # ¥0.16/h — Si primitive cell territory
-    if n_atoms <= 60:
-        return "c8_m32_cpu"
-    return "c16_m64_cpu"
-
-
-def estimate_cost(machine_type: str, minutes: float) -> str:
-    rates = {"c2_m8_cpu": 0.16, "c8_m32_cpu": 0.4, "c16_m64_cpu": 0.96}
-    rate = rates.get(machine_type, 0.16)
-    return f"{machine_type} ¥{rate}/h × {minutes:.0f}min ≈ ¥{rate * minutes / 60:.3f}"
 
 
 # --------------------------------------------------------------------------
@@ -82,7 +59,7 @@ def count_atoms(stru_path: Path) -> int:
     """
     body = _stru_section(stru_path, "ATOMIC_POSITIONS")
     if not body:
-        raise BohrError(f"STRU has no ATOMIC_POSITIONS entries: {stru_path}")
+        raise AbacusError(f"STRU has no ATOMIC_POSITIONS entries: {stru_path}")
 
     def is_num(tok: str) -> bool:
         try:
@@ -134,11 +111,11 @@ def write_inputs(profile: MaterialProfile, out_dir: Path) -> dict[str, Any]:
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     if not profile.structure:
-        raise BohrError(f"profile '{profile.name}' has no structure file")
+        raise AbacusError(f"profile '{profile.name}' has no structure file")
 
     n_atoms = count_atoms(profile.structure)
     if n_atoms > profile.max_atoms:
-        raise BohrError(
+        raise AbacusError(
             f"plan refused: {n_atoms} atoms exceeds profile budget "
             f"max_atoms={profile.max_atoms} — shrink the cell or raise the budget "
             "explicitly (that is a user decision, not an agent decision)"
@@ -161,7 +138,7 @@ def write_inputs(profile: MaterialProfile, out_dir: Path) -> dict[str, Any]:
     for rel in orbitals:
         src = (src_dir / rel).resolve()
         if not src.is_relative_to(src_dir.resolve()):
-            raise BohrError(f"orbital path escapes source dir: {rel}")
+            raise AbacusError(f"orbital path escapes source dir: {rel}")
         dest = out_dir / Path(rel).name
         if src.is_dir():
             shutil.copytree(src, dest, dirs_exist_ok=True)
@@ -191,98 +168,101 @@ def write_inputs(profile: MaterialProfile, out_dir: Path) -> dict[str, Any]:
     )
     (out_dir / "INPUT").write_text(input_text, encoding="utf-8")
 
-    machine = route_machine(n_atoms)
     return {
         "dir": str(out_dir),
         "atoms": n_atoms,
         "engine": profile.engine,
         "basis": tpl["basis_type"],
         "files": copied,
-        "machine_type": machine,
-        "estimated_cost": estimate_cost(machine, minutes=2),
         "notes": profile.notes,
     }
 
 
-def build_job_json(out_dir: Path, job_name: str, machine_type: str,
-                   np_mpi: int = 2) -> Path:
-    project_id = os.environ.get("BOHRIUM_PROJECT_ID")
-    if not project_id:
-        raise BohrError(
-            "BOHRIUM_PROJECT_ID is not set — put it in .env and export it. "
-            "Dry-run works without it; real submission does not."
+# --------------------------------------------------------------------------
+# execution: upload → run on the user's SSH machine → fetch results
+# --------------------------------------------------------------------------
+def remote_dir(task_id: str) -> str:
+    """Fixed remote namespace: ~/neagent/<task_id>. task_id is validated so
+    it can never smuggle shell syntax into a remote command line."""
+    if not re.fullmatch(r"[A-Za-z0-9._-]+", task_id):
+        raise AbacusError(
+            f"task_id must match [A-Za-z0-9._-]+ (got {task_id!r}) — it is "
+            "used as a remote path segment and must not carry shell syntax"
         )
-    job = {
-        "job_name": job_name,
-        "command": f"OMP_NUM_THREADS=1 mpirun -np {np_mpi} abacus > log",
-        "log_file": "log",
-        "backward_files": ["OUT.ABACUS"],
-        "project_id": int(project_id),
-        "platform": "ali",
-        "job_type": "container",
-        "machine_type": machine_type,
-        "image_address": IMAGE_ABACUS,
-    }
-    p = Path(out_dir) / "job.json"
-    p.write_text(json.dumps(job, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    return p
+    return f"~/neagent/{task_id}"
 
 
-# --------------------------------------------------------------------------
-# execution: dry-run always allowed; real submit is the gated path
-# --------------------------------------------------------------------------
-def _run_bohr(args: list[str], timeout: int = 120) -> subprocess.CompletedProcess:
+def _validate_np(np_mpi: Any) -> int:
+    """np_mpi lands on a remote shell command line. CLI dispatch passes every
+    kwarg as a string, so without this check np_mpi='2; cmd' would be remote
+    command injection. Coerce to a bounded int before any interpolation."""
     try:
-        return subprocess.run(
-            ["bohr", *args], capture_output=True, text=True, timeout=timeout)
-    except FileNotFoundError:
-        raise BohrError("bohr CLI not found on PATH (install via pip install bohrium)")
+        n = int(np_mpi)
+    except (TypeError, ValueError):
+        raise AbacusError(f"np_mpi must be an integer, got {np_mpi!r}")
+    if not 1 <= n <= 128:
+        raise AbacusError(f"np_mpi out of range (1..128): {n}")
+    return n
 
 
-def dry_run(job_json: Path) -> dict[str, Any]:
-    """Validate job.json via the CLI's own dry-run. No cost, no state change."""
-    r = _run_bohr(["job", "submit", "--dry-run", "--file", str(job_json)])
-    return {
-        "ok": r.returncode == 0,
-        "stdout": r.stdout[-2000:],
-        "stderr": r.stderr[-2000:],
-        "mode": "dry-run (no cost, nothing submitted)",
-    }
+def ssh_execute(indir: Path, task_id: str, out_dir: Path, *,
+                np_mpi: int = 2, timeout: int = 1800) -> dict[str, Any]:
+    """Run the planned calculation on the user's SSH machine.
 
+    Sequence: preflight (mkdir + abacus/mpirun present) → pack ALL inputs
+    (orbital directories included) into one tarball → upload → blocking SCF
+    run → tar the outputs → download + unpack locally.
+    On SCF failure the log is still fetched (it is the evidence of what
+    happened); `ok` reflects the remote exit code.
+    """
+    import tarfile
 
-def submit(job_json: Path) -> dict[str, Any]:
-    """Real submission. Reachable ONLY through the tool gateway with the
-    approval gate satisfied; the caller (tools.py) registers the returned
-    job_id into the task whitelist after success."""
-    r = _run_bohr(["job", "submit", "--file", str(job_json)], timeout=300)
-    out = r.stdout + "\n" + r.stderr
-    m = re.search(r"[Jj]ob[_ ]?[Ii]d[:\s=]+(\d+)", out)
-    return {
-        "ok": r.returncode == 0,
-        "job_id": m.group(1) if m else None,
-        "stdout": r.stdout[-2000:],
-        "stderr": r.stderr[-2000:],
-    }
-
-
-def job_status(job_id: str) -> dict[str, Any]:
-    r = _run_bohr(["job", "info", "--job-id", str(job_id)])
-    return {"ok": r.returncode == 0, "stdout": r.stdout[-2000:], "stderr": r.stderr[-1000:]}
-
-
-def fetch(job_id: str, out_dir: Path, *, owns_job: Any) -> dict[str, Any]:
-    """Download results. Red line: refuse any job_id not owned by this task."""
-    if not owns_job(job_id):
-        raise BohrError(
-            f"refused: job {job_id} is not in this task's job_ids whitelist. "
-            "The runtime only touches resources this project created."
-        )
-    out_dir = Path(out_dir)
+    from . import sshrun
+    np_mpi = _validate_np(np_mpi)  # before ANY command interpolation
+    indir, out_dir = Path(indir), Path(out_dir)
+    inputs = sorted(f for f in indir.rglob("*") if f.is_file())
+    if not inputs:
+        raise AbacusError(f"no input files under {indir}; run dft.plan first")
+    remote = remote_dir(task_id)
     out_dir.mkdir(parents=True, exist_ok=True)
-    r = _run_bohr(["job", "download", "--job-id", str(job_id), "--source",
-                   str(out_dir)], timeout=600)
-    return {"ok": r.returncode == 0, "dir": str(out_dir),
-            "stdout": r.stdout[-2000:], "stderr": r.stderr[-1000:]}
+
+    r = sshrun.run(f"mkdir -p {remote} && command -v abacus >/dev/null "
+                   f"&& command -v mpirun >/dev/null")
+    if not r["ok"]:
+        return {"ok": False, "stage": "preflight",
+                "stdout": r["stdout"][-2000:], "stderr": (
+                    "remote preflight failed: need ~/neagent writable and "
+                    "'abacus' + 'mpirun' on PATH — " + r["stderr"][-500:])}
+
+    # one archive covers everything write_inputs produced, including orbital
+    # directories (a per-file upload loop would silently skip them)
+    pkg = out_dir / "inputs.tar.gz"
+    with tarfile.open(pkg, "w:gz") as tar:
+        tar.add(indir, arcname=".")
+    r = sshrun.upload(pkg, f"{remote}/inputs.tar.gz")
+    pkg.unlink(missing_ok=True)
+    if not r["ok"]:
+        return {"ok": False, "stage": "upload",
+                "stdout": r["stdout"][-500:], "stderr": r["stderr"][-1000:]}
+
+    # run SCF; even on failure, tar the outputs so the log comes home
+    run_cmd = (f"cd {remote} && tar xzf inputs.tar.gz && "
+               f"rm -rf OUT.ABACUS log results.tar.gz && "
+               f"(OMP_NUM_THREADS=1 mpirun -np {np_mpi} abacus > log 2>&1); "
+               f"code=$?; tar czf results.tar.gz OUT.ABACUS log 2>/dev/null; "
+               f"exit $code")
+    r = sshrun.run(run_cmd, timeout=timeout)
+
+    d = sshrun.download(f"{remote}/results.tar.gz", out_dir / "results.tar.gz")
+    if d["ok"]:
+        shutil.unpack_archive(out_dir / "results.tar.gz", out_dir, "gztar")
+    else:
+        return {"ok": False, "stage": "download",
+                "stdout": r["stdout"][-1000:], "stderr": d["stderr"][-1000:]}
+
+    return {"ok": r["ok"], "stage": "run", "dir": str(out_dir),
+            "log": str(out_dir / "log"),
+            "stdout": r["stdout"][-2000:], "stderr": r["stderr"][-1000:]}
 
 
 # --------------------------------------------------------------------------

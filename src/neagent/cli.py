@@ -86,6 +86,7 @@ def cmd_demo(a) -> int:
     rt.gateway.dispatch("data.quality", task_id=tid, profile_name="ncm")
     rt.gateway.dispatch("features.derive", task_id=tid, profile_name="ncm")
     result = rt.gateway.dispatch("models.baseline", task_id=tid, profile_name="ncm")
+    rt.gateway.dispatch("evidence.report", task_id=tid)  # needs_review → completed
     _print({"task": tid, "state": rt.store.state(tid).value, "result": result})
     return 0
 
@@ -137,6 +138,8 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
+    from .paths import load_dotenv
+    load_dotenv()  # credentials live in .env; real env vars win
     a = build_parser().parse_args(argv)
     return a.fn(a)
 

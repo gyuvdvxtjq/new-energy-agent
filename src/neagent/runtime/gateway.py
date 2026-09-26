@@ -38,6 +38,20 @@ class WrongStateError(RuntimeError):
         )
 
 
+class ToolFailedError(RuntimeError):
+    """Raised when a tool ran but reported failure (ok_key falsy) — the
+    state machine intentionally does not advance on failure."""
+
+    def __init__(self, tool: str, task_id: str | None, ok_key: str,
+                 detail: Any = None):
+        self.tool, self.task_id, self.ok_key, self.detail = tool, task_id, ok_key, detail
+        msg = (f"tool '{tool}' reported {ok_key}=false for task '{task_id}' — "
+               f"state NOT advanced. Inspect the result, fix the cause, retry.")
+        if detail:
+            msg += f"\nlast output: {str(detail)[-500:]}"
+        super().__init__(msg)
+
+
 @dataclass
 class ToolSpec:
     name: str
@@ -51,6 +65,13 @@ class ToolSpec:
     requires_task: bool = True
     allowed_states: list[str] = field(default_factory=list)
     success_trigger: str | None = None
+    ok_key: str | None = None
+    content_paths_resolver: Callable[[str], list[Path]] | None = None
+    """ok_key: result field that gates success_trigger. If set (e.g. dft
+    tools return {"ok": bool}), the state advances ONLY when result[ok_key]
+    is truthy — a failed submit/fetch must not move the task forward.
+    content_paths_resolver: for gated tools, returns the file set the
+    approval must be bound to (checked by the gate at dispatch time)."""
 
 
 def _short(result: Any, limit: int = 300) -> Any:
@@ -117,10 +138,16 @@ class ToolGateway:
             if not task_id:
                 raise ValueError(f"tool '{tool_name}' requires a task_id")
             # gated tools hit the approval gate FIRST: the clearest failure
-            # mode for a paid op is "you have no approval", not a state error
+            # mode for a paid op is "you have no approval", not a state error.
+            # content_paths_resolver (set by the tool registration) binds the
+            # approval to the exact input content at dispatch time — BEFORE
+            # the state check, so a stale approval is caught even if the
+            # task state alone would have allowed it.
             if spec.gated:
                 assert task_id
-                self.gate.require(task_id)
+                content = (spec.content_paths_resolver(task_id)
+                           if spec.content_paths_resolver else None)
+                self.gate.require(task_id, content_paths=content)
             current = self.store.state(task_id)
             # terminal states reject everything except read-only inspection
             # (task.status/task.list on a completed task) and tools that
@@ -135,10 +162,24 @@ class ToolGateway:
         result = spec.fn(task_id=task_id, **kwargs)
 
         if spec.requires_task and task_id and spec.success_trigger:
-            self.store.transition(
-                task_id, spec.success_trigger,
-                allow_local_shortcut=not spec.paid,
-            )
+            # result gating: a tool that reports failure (ok=False) must NOT
+            # advance the state machine — "the call returned" is not success
+            if spec.ok_key is None or (isinstance(result, dict)
+                                       and result.get(spec.ok_key)):
+                # the planned→running shortcut is for LOCAL workflows only;
+                # a compute workflow's only path to running is the paid,
+                # gated dft.run (approved→running)
+                task_doc = self.store.load(task_id)
+                shortcut_ok = (not spec.paid
+                               and task_doc.get("workflow") != "compute")
+                self.store.transition(
+                    task_id, spec.success_trigger,
+                    allow_local_shortcut=shortcut_ok,
+                )
+            else:
+                detail = result.get("stderr") or result.get("stdout") \
+                    if isinstance(result, dict) else None
+                raise ToolFailedError(tool_name, task_id, spec.ok_key, detail)
         self._audit("ok", tool_name, task_id, {"result": _short(result)})
 
         if spec.requires_task and task_id:

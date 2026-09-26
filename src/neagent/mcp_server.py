@@ -82,6 +82,8 @@ def handle(req: dict, rt) -> dict | None:
 
 
 def main(workspace: Path | None = None) -> int:
+    from .paths import load_dotenv
+    load_dotenv()  # credentials live in .env; real env vars win
     rt = build_runtime(workspace or workspace_root())
     for line in sys.stdin:
         line = line.strip()

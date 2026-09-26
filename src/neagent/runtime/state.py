@@ -6,12 +6,27 @@ CLI must go through TaskStore.transition(); the host LLM has no other channel.
 
 from __future__ import annotations
 
+import re
 import time
 from enum import Enum
 from pathlib import Path
 from typing import Any
 
 import yaml
+
+_TASK_ID_RE = re.compile(r"[A-Za-z0-9._-]+")
+
+
+def validate_task_id(task_id: str) -> str:
+    """task_id becomes a path segment (workspace dirs, the remote ~/neagent/<id>
+    namespace), so it is restricted to a shell- and path-safe alphabet. Pure-dot
+    ids ('.', '..') pass the regex but are traversal, so they are rejected too."""
+    if (not task_id or not _TASK_ID_RE.fullmatch(task_id)
+            or set(task_id) <= {"."}):
+        raise ValueError(
+            f"illegal task_id {task_id!r}: must match [A-Za-z0-9._-]+ and not "
+            "be all dots — it is used as a path segment locally and remotely")
+    return task_id
 
 
 class TaskState(str, Enum):
@@ -79,6 +94,7 @@ class TaskStore:
         return self.tasks_dir / task_id / "task.yaml"
 
     def create(self, task_id: str, title: str, workflow: str) -> dict[str, Any]:
+        validate_task_id(task_id)
         p = self.path(task_id)
         if p.exists():
             raise FileExistsError(f"task '{task_id}' already exists: {p}")
@@ -94,13 +110,13 @@ class TaskStore:
                 {"at": time.strftime("%Y-%m-%dT%H:%M:%S"), "from": None,
                  "to": TaskState.DRAFT.value, "trigger": "create"}
             ],
-            "job_ids": [],  # Bohrium job ids created BY THIS PROJECT (whitelist)
         }
         p.parent.mkdir(parents=True, exist_ok=True)
         self._write(p, doc)
         return doc
 
     def load(self, task_id: str) -> dict[str, Any]:
+        validate_task_id(task_id)
         p = self.path(task_id)
         if not p.exists():
             raise FileNotFoundError(f"unknown task '{task_id}': {p} not found")
@@ -114,9 +130,16 @@ class TaskStore:
 
         allow_local_shortcut is set by the gateway for non-paid tools; it never
         applies to paid triggers (request_submit/confirm/execute on paid tools).
+        The gateway additionally passes allow_local_shortcut=False for paid
+        workflows (compute) so the paid path is the only path.
         """
         doc = self.load(task_id)
         current = doc["state"]
+        if allow_local_shortcut:
+            # the shortcut exists for lightweight LOCAL workflows (predict);
+            # a compute workflow must go through the approval states
+            if doc.get("workflow") == "compute":
+                raise IllegalTransitionError(current, trigger)
         key = (current, trigger)
         next_state = TRANSITIONS.get(key)
         if next_state is None and allow_local_shortcut:
@@ -142,18 +165,6 @@ class TaskStore:
         doc["steps"].append(step)
         doc["updated_at"] = time.strftime("%Y-%m-%dT%H:%M:%S")
         self._write(self.path(task_id), doc)
-
-    def add_job_id(self, task_id: str, job_id: str) -> None:
-        """Register a Bohrium job id created by this project. The bohr wrapper
-        MUST refuse write operations on job ids not in this whitelist."""
-        doc = self.load(task_id)
-        if job_id not in doc["job_ids"]:
-            doc["job_ids"].append(job_id)
-        doc["updated_at"] = time.strftime("%Y-%m-%dT%H:%M:%S")
-        self._write(self.path(task_id), doc)
-
-    def owns_job(self, task_id: str, job_id: str) -> bool:
-        return job_id in self.load(task_id).get("job_ids", [])
 
     @staticmethod
     def _write(p: Path, doc: dict[str, Any]) -> None:

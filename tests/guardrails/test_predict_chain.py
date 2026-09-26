@@ -28,6 +28,22 @@ class PredictChainTests(unittest.TestCase):
             m = gw.dispatch("models.baseline", task_id="p1", profile_name="ncm")
             self.assertIn("random train_test_split", m["split_rule"])  # honest rule
             self.assertEqual(rt.store.state("p1").value, "needs_review")
+            # evidence.report is the accept step for BOTH chains — a predict
+            # task must be able to reach completed (manifest over outputs/)
+            rep = gw.dispatch("evidence.report", task_id="p1")
+            self.assertEqual(rt.store.state("p1").value, "completed")
+            self.assertGreaterEqual(rep["artifacts"], 3)  # quality/features/baseline
+
+    def test_revise_loops_back_for_rework(self):
+        with tempfile.TemporaryDirectory() as d:
+            rt = build_runtime(Path(d))
+            gw = rt.gateway
+            gw.dispatch("task.init", task_id="p2", title="x", workflow="predict")
+            gw.dispatch("task.plan", task_id="p2")
+            gw.dispatch("task.execute", task_id="p2")
+            gw.dispatch("task.finish", task_id="p2")
+            gw.dispatch("task.revise", task_id="p2")  # needs_review → planned
+            self.assertEqual(rt.store.state("p2").value, "planned")
 
     def test_crash_recovery(self):
         with tempfile.TemporaryDirectory() as d:

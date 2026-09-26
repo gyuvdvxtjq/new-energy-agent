@@ -4,7 +4,7 @@
   * material.structure  本地结构文件（或 roadmap: MP ID）
   * material.source     预测链数据 CSV（无则预测链不适用）
   * compute.template    ABACUS 参数模板（profiles/templates/*.yaml）
-  * budget.max_atoms    计算预算（超限由 bohr.plan 直接拒单——预算是用户决定）
+  * budget.max_atoms    计算预算（超限由 dft.plan 直接拒单——预算是用户决定）
 """
 
 from __future__ import annotations

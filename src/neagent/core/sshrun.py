@@ -56,7 +56,7 @@ def _password_auth() -> bool:
 def _put_via_stdin(local: Path, remote: str) -> dict[str, str]:
     """Fallback upload: stream through an exec channel's stdin.
 
-    Some hosts (e.g. Bohrium nodes whose .bashrc prints an environment banner)
+    Some hosts (e.g. nodes whose .bashrc prints an environment banner)
     corrupt the SFTP handshake; exec channels are unaffected because we only
     write to stdin and read stderr.
     """

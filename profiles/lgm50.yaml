@@ -1,0 +1,17 @@
+# LG M50 电芯循环老化数据 profile（预测链第二场景：电芯级时序）
+material:
+  name: "LG M50 电芯循环老化数据（Zenodo 4032561, cell03）"
+  source: "demo_run/datasets/cycle_ml.csv"   # cycle 级时序：容量/电流/电压/温度
+  structure: null
+compute:
+  engine: abacus
+  template: null                  # 电芯级数据，compute 链不适用
+budget:
+  max_atoms: 0
+prediction:
+  target: "capacity_ah"
+  group: "cycle"                  # 按循环圈分组切分，避免相邻时间步泄漏进测试集
+notes: >
+  电芯级时序数据（单电芯），存在的意义是证明"换场景 = 加一个 YAML"。
+  电压/电流/温度与容量是同步测量值，按 cycle 分组切分后仍属同时刻拟合，
+  结论仅为链路冒烟测试，不得外推为容量预测能力。

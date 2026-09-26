@@ -30,7 +30,7 @@ class McpHandlerTests(unittest.TestCase):
     def test_tools_list_excludes_self_approval(self):
         resp = handle({"jsonrpc": "2.0", "id": 2, "method": "tools/list"}, self.rt)
         names = {t["name"] for t in resp["result"]["tools"]}
-        self.assertIn("bohr.submit", names)
+        self.assertIn("dft.run", names)
         self.assertNotIn("gate.approve", names)
         self.assertNotIn("task.confirm", names)
 
