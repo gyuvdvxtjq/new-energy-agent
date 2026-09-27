@@ -184,10 +184,11 @@ def write_inputs(profile: MaterialProfile, out_dir: Path) -> dict[str, Any]:
 def remote_dir(task_id: str) -> str:
     """Fixed remote namespace: ~/neagent/<task_id>. task_id is validated so
     it can never smuggle shell syntax into a remote command line."""
-    if not re.fullmatch(r"[A-Za-z0-9._-]+", task_id):
+    if not re.fullmatch(r"[A-Za-z0-9._-]+", task_id) or set(task_id) <= {"."}:
         raise AbacusError(
-            f"task_id must match [A-Za-z0-9._-]+ (got {task_id!r}) — it is "
-            "used as a remote path segment and must not carry shell syntax"
+            f"task_id must match [A-Za-z0-9._-]+ and not be all dots "
+            f"(got {task_id!r}) — it is used as a remote path segment and "
+            "must not carry shell syntax or traversal"
         )
     return f"~/neagent/{task_id}"
 
